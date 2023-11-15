@@ -7,9 +7,9 @@ app = Flask(__name__)
 # Define Flask appliation endpoints
 @app.route("/")
 def root():
-    return jsonify({ "status": "up" })
+    return jsonify({ "status": "running" })
 
-#@app.route("/image", methods =['POST'])
+#@app.route("/image")
 #def recognize_object_from_image():
 
 # Run the Flask API based on the configuration above
