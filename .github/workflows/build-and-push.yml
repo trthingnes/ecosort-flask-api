@@ -19,4 +19,4 @@ jobs:
       - name: Build and push image
         run: |
           docker build . --tag ghcr.io/trthingnes/ecosort-flask-api:latest
-          docker push --tag ghcr.io/trthingnes/ecosort-flask-api:latest
+          docker push ghcr.io/trthingnes/ecosort-flask-api:latest
