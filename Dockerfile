@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.7
 
 # Add all project files to the Docker environment
 RUN mkdir /ecosort-flask-api
