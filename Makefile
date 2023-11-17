@@ -4,7 +4,7 @@ build:
 
 .PHONY: run
 run:
-	docker run ghcr.io/trthingnes/ecosort-flask-api:latest
+	docker run -p 8080:8080 ghcr.io/trthingnes/ecosort-flask-api:latest
 
 .PHONY: push
 push:

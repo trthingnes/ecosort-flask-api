@@ -16,16 +16,14 @@ from io import BytesIO
 
 number_of_predictions = 5
 model_name = 'google/vit-base-patch16-224'
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = ViTForImageClassification.from_pretrained(model_name)
-model.to(device)
 processor = ViTImageProcessor.from_pretrained(model_name)
+model = ViTForImageClassification.from_pretrained(model_name)
 
 @app.route("/image", methods=["POST"])
 def recognize_objects_from_image():
     image_blob = request.data
     image = Image.open(BytesIO(image_blob))
-    inputs = processor(images=image, return_tensors="pt").to(device)
+    inputs = processor(images=image, return_tensors="pt")
     pixel_values = inputs.pixel_values
 
     with torch.no_grad():
@@ -41,5 +39,5 @@ def recognize_objects_from_image():
 
 # Start the Flask API when file is executed
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
-    # serve(app, host="0.0.0.0", port=8080)
+    # app.run(host='0.0.0.0', port=8080)
+    serve(app, host="0.0.0.0", port=8080)
