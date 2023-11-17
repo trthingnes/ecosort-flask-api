@@ -22,12 +22,12 @@ spec:
             - containerPort: 8080
           resources:
             limits:
-              ephemeral-storage: 256M
-              memory: 256M
+              ephemeral-storage: 1024M
+              memory: 1024M
               cpu: 100m
             requests:
-              ephemeral-storage: 256M
-              memory: 256M
+              ephemeral-storage: 1024M
+              memory: 1024M
               cpu: 100m
       imagePullSecrets:
         - name: github-registry-credentials
