@@ -34,7 +34,7 @@ def recognize_objects_from_image():
     for v, i in zip(values.flatten(), indices.flatten()):
         scores.append({ "score": round(v.item(), 2), "label": model.config.id2label[i.item()] })
 
-    return jsonify({ "scores": scores })
+    return jsonify(scores)
 
 # Start the Flask API when file is executed
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+# kubectl apply -n kaist-ecosort -f deployment.yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,12 +25,12 @@ spec:
           resources:
             limits:
               ephemeral-storage: 1024M
-              memory: 1024M
-              cpu: 100m
+              memory: 4096M
+              cpu: 1
             requests:
               ephemeral-storage: 1024M
-              memory: 1024M
-              cpu: 100m
+              memory: 4096M
+              cpu: 1
       imagePullSecrets:
         - name: github-registry-credentials
 status: {}
@@ -61,6 +63,7 @@ spec:
     - path: /.*
       methods:
         - GET
+        - POST
       accessStrategies:
         - handler: allow
       service:
