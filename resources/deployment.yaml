@@ -1,4 +1,5 @@
-# kubectl apply -n kaist-ecosort -f deployment.yaml
+# The following configuration can be used to deploy the API to Kyma
+# Command: kubectl apply -n kaist-ecosort -f deployment.yaml
 
 apiVersion: apps/v1
 kind: Deployment
