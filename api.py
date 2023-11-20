@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+from chat import forward_message_to_openai
+from object_recognition import recognize_objects_from_image
 
 app = Flask(__name__)
 
@@ -7,34 +9,17 @@ app = Flask(__name__)
 def root():
     return jsonify({ "status": "running" })
 
-# Object recognition from image
-import torch
-from transformers import ViTForImageClassification, ViTImageProcessor
-from PIL import Image
-from io import BytesIO
+@app.route("/chat", methods=["POST"])
+def chat_message():
+    body = request.get_json()
+    conversation_id = body.get("conversation_id", None)
+    message = body.get("message", None)
 
-number_of_predictions = 5
-model_name = 'google/vit-base-patch16-224'
-processor = ViTImageProcessor.from_pretrained(model_name)
-model = ViTForImageClassification.from_pretrained(model_name)
+    return jsonify(forward_message_to_openai(conversation_id, message))
 
 @app.route("/image", methods=["POST"])
-def recognize_objects_from_image():
-    image_blob = request.data
-    image = Image.open(BytesIO(image_blob))
-    inputs = processor(images=image, return_tensors="pt")
-    pixel_values = inputs.pixel_values
-
-    with torch.no_grad():
-        outputs = model(pixel_values)
-    logits = outputs.logits
-    values, indices = torch.topk(logits, number_of_predictions)
-    
-    scores = []
-    for v, i in zip(values.flatten(), indices.flatten()):
-        scores.append({ "score": round(v.item(), 2), "label": model.config.id2label[i.item()] })
-
-    return jsonify(scores)
+def image_recognition():
+    return jsonify(recognize_objects_from_image(request.data))
 
 # Start the Flask API when file is executed
 if __name__ == "__main__":
