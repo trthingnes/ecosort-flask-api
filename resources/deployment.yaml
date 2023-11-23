@@ -32,6 +32,13 @@ spec:
               ephemeral-storage: 1024M
               memory: 4096M
               cpu: 1
+        env:
+          - name: AZURE_OPENAI_API_ENDPOINT
+            value: <INSERT URL TO AZURE OPENAPI ENDPOINT HERE>
+          - name: AZURE_OPENAI_API_KEY
+            value: <INSERT API KEY FOR AZURE OPENAPI ENDPOINT HERE>
+          - name: AZURE_OPENAI_API_VERSION
+            value: 2023-05-15
       imagePullSecrets:
         - name: github-registry-credentials
 status: {}
