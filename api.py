@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from flask import Flask, request, Response, jsonify
-from chat import create_conversation, send_message_in_conversation, delete_conversation
+from chat import create_conversation, send_message_in_conversation
 from object_recognition import recognize_objects_from_image
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ def start_chat():
     message = body.get("message", None)
     c_id, messages = create_conversation()
 
-    return jsonify({"id": c_id, "messages": [dict(m) for m in messages]})
+    return jsonify({"id": c_id, "messages": [dict(m) for m in messages[1:]]})
 
 
 @app.route("/chats/<id>", methods=["POST"])
@@ -29,14 +29,7 @@ def continue_chat(id):
     message = body.get("message", None)
     c_id, messages = send_message_in_conversation(id, message)
 
-    return jsonify({"id": c_id, "messages": [dict(m) for m in messages]})
-
-
-@app.route("/chats/<id>", methods=["DELETE"])
-def delete_chat(id):
-    delete_conversation(id)
-
-    return Response(status=200)
+    return jsonify({"id": c_id, "messages": [dict(m) for m in messages[1:]]})
 
 
 @app.route("/image", methods=["POST"])
