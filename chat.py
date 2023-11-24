@@ -41,6 +41,9 @@ def create_conversation():
 
 def send_message_in_conversation(uuid: str, message: str):
     """Sends a new user message in the conversation and returns the assistant response"""
+
+    cleanup() # Delete all conversations in memory if no requests were made in the last while
+
     # Add the users message to the list
     messages = conversations[uuid]
     messages.append({"role": "user", "content": message})
@@ -61,3 +64,5 @@ def cleanup():
     if time.time() - last_request_time > 1800:
         conversations.clear()
         print("Cleared conversations from previous session")
+    
+    last_request_time = time.time()
