@@ -7,9 +7,6 @@ RUN pip install flask
 RUN pip install pillow
 RUN pip install openai
 RUN pip install python-dotenv
-RUN pip install nltk
-RUN pip install hdbcli
-RUN pip install scikit-learn
 
 # Create folder for the API and copy files into it
 WORKDIR /api

@@ -4,23 +4,14 @@ Flask API used for project in BTM481 Business Solutions with AI @ KAIST
 
 ## Run locally
 
-1. Install the packages listed in the `requirements.txt` file or use the following command to install using pip:
-
-```
-pip install -r requirements.txt
-```
+1. Install the packages listed in the `Dockerfile` run commands.
 
 2. Create a file named `.env` in the project root and add following content to it:
-
-```
-AZURE_OPENAI_API_ENDPOINT=
-AZURE_OPENAI_API_KEY=
-AZURE_OPENAI_API_VERSION=
-HANA_HOST=
-HANA_PORT=
-HANA_USER=
-HANA_PASSWORD=
-```
+   ```js
+   AZURE_OPENAI_API_ENDPOINT=
+   AZURE_OPENAI_API_KEY=
+   AZURE_OPENAI_API_VERSION=2023-05-15
+   ```
 
 3. Run `python api.py` to start the API.
 
