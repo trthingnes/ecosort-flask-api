@@ -1,4 +1,5 @@
 import os
+import time
 from uuid import uuid1
 from openai import AzureOpenAI
 
@@ -19,11 +20,15 @@ client = AzureOpenAI(
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
     api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
 )
+last_request_time = time.time()
 conversations = {}
 
 
 def create_conversation():
     """Starts a new conversation by creating an ID and inserting the system/assistant message"""
+
+    cleanup() # Delete all conversations in memory if no requests were made in the last while
+
     uuid = str(uuid1())
     messages = [
         {"role": "system", "content": " ".join(INSTRUCTIONS)},
@@ -36,6 +41,9 @@ def create_conversation():
 
 def send_message_in_conversation(uuid: str, message: str):
     """Sends a new user message in the conversation and returns the assistant response"""
+
+    cleanup() # Delete all conversations in memory if no requests were made in the last while
+
     # Add the users message to the list
     messages = conversations[uuid]
     messages.append({"role": "user", "content": message})
@@ -49,3 +57,12 @@ def send_message_in_conversation(uuid: str, message: str):
     conversations[uuid] = messages
 
     return uuid, messages
+
+
+def cleanup():
+    """Clear conversations if there has been no activity last 30 min"""
+    if time.time() - last_request_time > 1800:
+        conversations.clear()
+        print("Cleared conversations from previous session")
+    
+    last_request_time = time.time()
