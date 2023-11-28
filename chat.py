@@ -61,6 +61,8 @@ def send_message_in_conversation(uuid: str, message: str):
 
 def cleanup():
     """Clear conversations if there has been no activity last 30 min"""
+    global last_request_time
+    
     if time.time() - last_request_time > 1800:
         conversations.clear()
         print("Cleared conversations from previous session")
