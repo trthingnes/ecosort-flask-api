@@ -11,14 +11,17 @@ load_dotenv()
 
 class ConversationManager:
     def __init__(self, hana_host, hana_port, hana_user, hana_password):
-        self.conn = dbapi.connect(
-            address=hana_host,
-            port=hana_port,
-            encrypt="true",
-            sslValidateCertificate="false",
-            user=hana_user,
-            password=hana_password
-        )
+        try:
+            self.conn = dbapi.connect(
+                address=hana_host,
+                port=hana_port,
+                encrypt="true",
+                sslValidateCertificate="false",
+                user=hana_user,
+                password=hana_password
+            )
+        except: 
+            print("couldn't connect to Database server")
 
     def _extract_keywords(self, sentence, num_keywords=5):
         
@@ -39,76 +42,91 @@ class ConversationManager:
         return sorted_keywords
 
     def update_keyword_frequency(self, keywords):
-        with self.conn.cursor() as cursor:
-            current_date = datetime.now().date()
-            twenty_four_hours_ago = datetime.now() - timedelta(days=1)
+        try:
+            with self.conn.cursor() as cursor:
+                current_date = datetime.now().date()
+                twenty_four_hours_ago = datetime.now() - timedelta(days=1)
 
-            for keyword in keywords:
-                sql_select = "SELECT keyword_id, frequency FROM KeywordFrequency WHERE keyword = ? AND timestamp >= ?"
-                cursor.execute(sql_select, (keyword, twenty_four_hours_ago))
-                result = cursor.fetchone()
+                for keyword in keywords:
+                    sql_select = "SELECT keyword_id, frequency FROM KeywordFrequency WHERE keyword = ? AND timestamp >= ?"
+                    cursor.execute(sql_select, (keyword, twenty_four_hours_ago))
+                    result = cursor.fetchone()
 
-                if result:
-                    (keyword_id, frequency) = result
-                    new_frequency = frequency + 1
-                    sql_update = "UPDATE KeywordFrequency SET frequency = ? WHERE keyword_id = ?"
-                    cursor.execute(sql_update, (new_frequency, keyword_id))
-                else:
-                    sql_insert = "INSERT INTO KeywordFrequency (keyword, frequency, timestamp) VALUES (?, 1, ?)"
-                    cursor.execute(sql_insert, (keyword, current_date))
+                    if result:
+                        (keyword_id, frequency) = result
+                        new_frequency = frequency + 1
+                        sql_update = "UPDATE KeywordFrequency SET frequency = ? WHERE keyword_id = ?"
+                        cursor.execute(sql_update, (new_frequency, keyword_id))
+                    else:
+                        sql_insert = "INSERT INTO KeywordFrequency (keyword, frequency, timestamp) VALUES (?, 1, ?)"
+                        cursor.execute(sql_insert, (keyword, current_date))
 
-            self.conn.commit()
+                self.conn.commit()
+        except: 
+            print("couldn't connect to Database server to update keywords or keyword extractor")
 
     def create_conversation(self, conversation_name):
-        with self.conn.cursor() as cursor:
-            sql = "INSERT INTO Conversation (conversation_name) VALUES (?)"
-            cursor.execute(sql, (conversation_name,))
+        try:
+            with self.conn.cursor() as cursor:
+                sql = "INSERT INTO Conversation (conversation_name) VALUES (?)"
+                cursor.execute(sql, (conversation_name,))
 
-            sql = "SELECT TOP 1 conversation_id FROM Conversation ORDER BY conversation_id DESC"
-            cursor.execute(sql)
-            conversation_id = cursor.fetchone()[0]
+                sql = "SELECT TOP 1 conversation_id FROM Conversation ORDER BY conversation_id DESC"
+                cursor.execute(sql)
+                conversation_id = cursor.fetchone()[0]
 
-        if conversation_id is None:
-            raise ValueError("Failed to retrieve conversation_id")
+            if conversation_id is None:
+                raise ValueError("Failed to retrieve conversation_id")
 
-        self.conn.commit()
-        return conversation_id
+            self.conn.commit()
+            return conversation_id
+        except: 
+            print("couldn't connect to Database server to create conversation")
 
     def add_message(self, conversation_id, message_text):
-        if conversation_id is None:
-            raise ValueError("conversation_id cannot be None")
+        try:
+            if conversation_id is None:
+                raise ValueError("conversation_id cannot be None")
 
-        with self.conn.cursor() as cursor:
-            sql = "INSERT INTO Message (conversation_id, message_text) VALUES (?, ?)"
-            cursor.execute(sql, (conversation_id, message_text))
+            with self.conn.cursor() as cursor:
+                sql = "INSERT INTO Message (conversation_id, message_text) VALUES (?, ?)"
+                cursor.execute(sql, (conversation_id, message_text))
 
-            sql = "SELECT TOP 1 message_id FROM Message ORDER BY message_id DESC"
-            cursor.execute(sql)
-            message_id = cursor.fetchone()[0]
+                sql = "SELECT TOP 1 message_id FROM Message ORDER BY message_id DESC"
+                cursor.execute(sql)
+                message_id = cursor.fetchone()[0]
 
-            keywords = self._extract_keywords(message_text)
-            self.update_keyword_frequency(keywords)
+                keywords = self._extract_keywords(message_text)
+                self.update_keyword_frequency(keywords)
 
-        if message_id is None:
-            raise ValueError("Failed to retrieve message_id")
+            if message_id is None:
+                raise ValueError("Failed to retrieve message_id")
 
-        self.conn.commit()
-        return message_id
+            self.conn.commit()
+            return message_id
+        except: 
+            print("couldn't connect to Database server to add message")
 
     def add_response(self, message_id, response_text):
-        with self.conn.cursor() as cursor:
-            sql = "INSERT INTO Response (message_id, response_text) VALUES (?, ?)"
-            cursor.execute(sql, (message_id, response_text))
+        try:
+            with self.conn.cursor() as cursor:
+                sql = "INSERT INTO Response (message_id, response_text) VALUES (?, ?)"
+                cursor.execute(sql, (message_id, response_text))
 
-            sql = "SELECT TOP 1 response_id FROM Response ORDER BY response_id DESC"
-            cursor.execute(sql)
-            response_id = cursor.fetchone()[0]
+                sql = "SELECT TOP 1 response_id FROM Response ORDER BY response_id DESC"
+                cursor.execute(sql)
+                response_id = cursor.fetchone()[0]
 
-        self.conn.commit()
-        return response_id
+            self.conn.commit()
+            return response_id
+        except: 
+            print("couldn't connect to Database server to add response")
 
     def close_connection(self):
-        self.conn.close()
+        try:
+            self.conn.close()
+        except: 
+            print("couldn't connect to Database server to close connection")
 
 if __name__ == "__main__":
     #test class

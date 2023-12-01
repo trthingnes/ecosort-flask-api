@@ -1,4 +1,5 @@
 .env
+env
 deployment-with-env.yaml
 
 # Byte-compiled / optimized / DLL files

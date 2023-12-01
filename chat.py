@@ -43,6 +43,8 @@ def create_conversation():
     ]
     uuid = str(uuid1())
     conversation_id = conversation_manager.create_conversation(uuid)
+    if not conversation_id:
+        conversation_id = uuid
     conversations[str(conversation_id)] = messages
 
     return conversation_id, messages
