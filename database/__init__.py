@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class ConversationManager:
+    # Currently this class ignores any DB errors to ensure the like demo will work no matter what.
+    # In a real life situation that is not a good solution, and should be improved.
+
     def __init__(self, hana_host, hana_port, hana_user, hana_password):
         try:
             self.conn = dbapi.connect(
@@ -21,7 +24,7 @@ class ConversationManager:
                 password=hana_password
             )
         except: 
-            print("couldn't connect to Database server")
+            print("Couldn't connect to HANA database")
 
     def _extract_keywords(self, sentence, num_keywords=5):
         
@@ -63,7 +66,7 @@ class ConversationManager:
 
                 self.conn.commit()
         except: 
-            print("couldn't connect to Database server to update keywords or keyword extractor")
+            print("Couldn't connect to HANA database, skipping keywords update")
 
     def create_conversation(self, conversation_name):
         try:
@@ -81,7 +84,7 @@ class ConversationManager:
             self.conn.commit()
             return conversation_id
         except: 
-            print("couldn't connect to Database server to create conversation")
+            print("Couldn't connect to HANA database, skipping conversation create")
 
     def add_message(self, conversation_id, message_text):
         try:
@@ -105,7 +108,7 @@ class ConversationManager:
             self.conn.commit()
             return message_id
         except: 
-            print("couldn't connect to Database server to add message")
+            print("Couldn't connect to HANA database, skipping message create")
 
     def add_response(self, message_id, response_text):
         try:
@@ -120,16 +123,17 @@ class ConversationManager:
             self.conn.commit()
             return response_id
         except: 
-            print("couldn't connect to Database server to add response")
+            print("Couldn't connect to HANA database, skipping response create")
 
     def close_connection(self):
         try:
             self.conn.close()
         except: 
-            print("couldn't connect to Database server to close connection")
+            print("Couldn't connect to HANA database, skipping connection close")
 
+
+# This code will only run if the DB file is run directly.
 if __name__ == "__main__":
-    #test class
     hana_host = os.getenv('HANA_HOST')
     hana_port = os.getenv('HANA_PORT')
     hana_user = os.getenv('HANA_USER')

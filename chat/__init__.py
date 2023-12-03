@@ -2,7 +2,7 @@ import os
 import time
 from uuid import uuid1
 from openai import AzureOpenAI
-from database.db import ConversationManager
+from database import ConversationManager
 
 MODEL = "gpt-35-turbo"
 INSTRUCTIONS = [

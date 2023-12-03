@@ -4,7 +4,7 @@ load_dotenv()
 
 from flask import Flask, request, jsonify
 from chat import create_conversation, send_message_in_conversation
-from object_recognition import recognize_objects_from_image
+from image import recognize_objects_from_image
 
 app = Flask(__name__)
 
