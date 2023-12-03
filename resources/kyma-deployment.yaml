@@ -39,6 +39,14 @@ spec:
             value: <INSERT API KEY FOR AZURE OPENAPI ENDPOINT HERE>
           - name: AZURE_OPENAI_API_VERSION
             value: 2023-05-15
+          - name: HANA_HOST
+            value: <HANA_HOST>
+          - name: HANA_PORT
+            value: "443"
+          - name: HANA_USER
+            value: <HANA_USER>
+          - name: HANA_PASSWORD
+            value: <HANA_PASSWORD>
       imagePullSecrets:
         - name: github-registry-credentials
 status: {}

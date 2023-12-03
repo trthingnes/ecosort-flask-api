@@ -1,5 +1,6 @@
 .env
-deployment-with-env.yaml
+env
+kyma-deployment-with-env.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

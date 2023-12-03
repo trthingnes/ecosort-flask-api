@@ -1,10 +1,10 @@
 from dotenv import load_dotenv
 
-load_dotenv() # Environment variables are loaded before any other code runs
+load_dotenv()
 
 from flask import Flask, request, jsonify
 from chat import create_conversation, send_message_in_conversation
-from object_recognition import recognize_objects_from_image
+from image import recognize_objects_from_image
 
 app = Flask(__name__)
 
@@ -16,6 +16,8 @@ def root():
 
 @app.route("/chats", methods=["POST"])
 def start_chat():
+    body = request.get_json()
+    message = body.get("message", None)
     c_id, messages = create_conversation()
 
     return jsonify({"id": c_id, "messages": [dict(m) for m in messages[1:]]})

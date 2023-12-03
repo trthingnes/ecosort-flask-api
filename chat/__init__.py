@@ -2,7 +2,7 @@ import os
 import time
 from uuid import uuid1
 from openai import AzureOpenAI
-
+from database import ConversationManager
 
 MODEL = "gpt-35-turbo"
 INSTRUCTIONS = [
@@ -20,6 +20,14 @@ client = AzureOpenAI(
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
     api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
 )
+
+hana_host = os.getenv('HANA_HOST')
+hana_port = os.getenv('HANA_PORT')
+hana_user = os.getenv('HANA_USER')
+hana_password = os.getenv("HANA_PASSWORD")
+
+conversation_manager = ConversationManager(hana_host, hana_port, hana_user, hana_password)
+
 last_request_time = time.time()
 conversations = {}
 
@@ -29,23 +37,26 @@ def create_conversation():
 
     cleanup() # Delete all conversations in memory if no requests were made in the last while
 
-    uuid = str(uuid1())
     messages = [
         {"role": "system", "content": " ".join(INSTRUCTIONS)},
         {"role": "assistant", "content": INITIAL_MESSAGE},
     ]
-    conversations[uuid] = messages
+    uuid = str(uuid1())
+    conversation_id = conversation_manager.create_conversation(uuid)
+    if not conversation_id:
+        conversation_id = uuid
+    conversations[str(conversation_id)] = messages
 
-    return uuid, messages
+    return conversation_id, messages
 
 
-def send_message_in_conversation(uuid: str, message: str):
+def send_message_in_conversation(c_id: str, message: str):
     """Sends a new user message in the conversation and returns the assistant response"""
 
     cleanup() # Delete all conversations in memory if no requests were made in the last while
 
     # Add the users message to the list
-    messages = conversations[uuid]
+    messages = conversations[str(c_id)]
     messages.append({"role": "user", "content": message})
 
     # Add the assistants response to the list
@@ -54,17 +65,20 @@ def send_message_in_conversation(uuid: str, message: str):
     messages.append({"role": "assistant", "content": response.content})
 
     # Update the conversation with two new messages
-    conversations[uuid] = messages
+    conversations[str(c_id)] = messages
 
-    return uuid, messages
+    message_id = conversation_manager.add_message(c_id, message)
+    response_id = conversation_manager.add_response(message_id, response.content)
+
+    return c_id, messages
 
 
 def cleanup():
     """Clear conversations if there has been no activity last 30 min"""
     global last_request_time
-    
     if time.time() - last_request_time > 1800:
         conversations.clear()
+        conversation_manager.close_connection()
         print("Cleared conversations from previous session")
     
     last_request_time = time.time()
